@@ -89,8 +89,8 @@ void screen_block_draw(padPt* Coord1, padPt* Coord2)
 
   x1=min(Coord1->x,Coord2->x);
   x2=max(Coord1->x,Coord2->x);
-  y1=min(Coord1->y,Coord2->y);
-  y2=max(Coord1->y,Coord2->y);
+  y1=min((Coord1->y^0x1FF)&0x1FF,(Coord2->y^0x1FF)&0x1FF);
+  y2=max((Coord1->y^0x1FF)&0x1FF,(Coord2->y^0x1FF)&0x1FF);
   
   screen_set_pen_mode();
   rect.x=x1;
@@ -107,7 +107,7 @@ void screen_block_draw(padPt* Coord1, padPt* Coord2)
 void screen_dot_draw(padPt* Coord)
 {
   screen_set_pen_mode();
-  SDL_RenderDrawPoint(renderer,Coord->x,Coord->y);
+  SDL_RenderDrawPoint(renderer,Coord->x,(Coord->y^0x1FF)&0x1FF);
   SDL_RenderPresent(renderer);
 }
 
@@ -117,7 +117,7 @@ void screen_dot_draw(padPt* Coord)
 void screen_line_draw(padPt* Coord1, padPt* Coord2)
 {
   screen_set_pen_mode();
-  SDL_RenderDrawLine(renderer,Coord1->x,Coord1->y,Coord2->x,Coord2->y);
+  SDL_RenderDrawLine(renderer,Coord1->x,(Coord1->y^0x1FF)&0x1FF,Coord2->x,(Coord2->y^0x1FF)&0x1FF);
   SDL_RenderPresent(renderer);
 }
 
@@ -126,7 +126,7 @@ void screen_line_draw(padPt* Coord1, padPt* Coord2)
  */
 void screen_char_draw(padPt* Coord, unsigned char* ch, unsigned char count)
 {
-    short offset; /* due to negative offsets */
+  short offset; /* due to negative offsets */
   unsigned short x;      /* Current X and Y coordinates */
   unsigned short y;
   unsigned short* px;   /* Pointers to X and Y coordinates used for actual plotting */
@@ -191,7 +191,7 @@ void screen_char_draw(padPt* Coord, unsigned char* ch, unsigned char count)
     }
 
   x=Coord->x;
-  y=Coord->y;
+  y=(Coord->y^0x1FF)&0x1FF;
   
   if (FastText==padF)
     {
