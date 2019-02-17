@@ -11,6 +11,7 @@
 #pragma warn(unused-param, off)
 
 #include <stdbool.h>
+#include <string.h>
 #include "terminal.h"
 #include "screen.h"
 
@@ -41,6 +42,13 @@ extern unsigned char CharHigh;
 extern padPt TTYLoc;
 
 extern unsigned char already_started;
+extern unsigned char fontm23[2048];
+
+static unsigned char BTAB[]={0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
+static unsigned char u;
+static unsigned char curr_word;
+
+#define FONTPTR(a) (a<<4)
 
 /**
  * terminal_init()
@@ -58,7 +66,7 @@ void terminal_init(void)
 void terminal_initial_position(void)
 {
   TTYLoc.x=0;
-  TTYLoc.y=100; // Right under splashscreen.
+  TTYLoc.y=240; // Right under splashscreen.
 }
 
 /**
@@ -219,4 +227,15 @@ void terminal_ext_out(padByte value)
  */
 void terminal_char_load(padWord charnum, charData theChar)
 {
+  memset(&fontm23[FONTPTR(charnum)],0,16);
+  for (curr_word=0;curr_word<8;curr_word++)
+    {
+      for (u=16; u-->0; )
+  	{
+  	  if (theChar[curr_word] & 1<<u)
+  	    {
+  	      fontm23[(FONTPTR(charnum)+u^0x0f)&0x0f]|=BTAB[curr_word];
+  	    }
+  	}
+    }
 }

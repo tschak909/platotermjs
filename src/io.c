@@ -7,13 +7,32 @@
  * io.h - Input/output functions (serial/ethernet)
  */
 
+#include <SDL.h>
+#include <SDL_net.h>
 #include "io.h"
+#include "protocol.h"
+
+#define true 1
+#define false 0
+
+IPaddress ip;
+TCPsocket sock;
+int len;
+SDLNet_SocketSet set;
+int numReady;
+unsigned char d;
+unsigned char DoNotSend=true;
 
 /**
  * io_init() - Set-up the I/O
  */
 void io_init(void)
 {
+  SDLNet_Init();
+  SDLNet_ResolveHost(&ip,"irata.online",2005);
+  sock=SDLNet_TCP_Open(&ip);
+  set=SDLNet_AllocSocketSet(1);
+  SDLNet_TCP_AddSocket(set,sock);
 }
 
 /**
@@ -21,6 +40,9 @@ void io_init(void)
  */
 void io_send_byte(unsigned char b)
 {
+  if (DoNotSend==1)
+    return;
+  SDLNet_TCP_Send(sock,&b,1);
 }
 
 /**
@@ -28,6 +50,13 @@ void io_send_byte(unsigned char b)
  */
 void io_main(void)
 {
+  numReady=SDLNet_CheckSockets(set,0);
+  if (numReady)
+    {
+      SDLNet_TCP_Recv(sock,&d,1);
+      printf("%c",d);
+      ShowPLATO(&d,1);
+    }
 }
 
 /**
@@ -35,4 +64,7 @@ void io_main(void)
  */
 void io_done(void)
 {
+  SDLNet_TCP_Close(sock);
+  SDLNet_FreeSocketSet(set);
+  SDLNet_Quit();
 }

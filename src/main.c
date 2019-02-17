@@ -10,19 +10,26 @@
 #include "splash.h"
 
 unsigned char already_started=false;
+SDL_Event event;
+int something_happened;
+
+extern unsigned char DoNotSend;
 
 void loop(void)
 {
+  something_happened=SDL_PollEvent(&event);
   keyboard_main();
   io_main();
-  SDL_Delay(16);
+  screen_main();
 }
 
 int main(void)
 {
   screen_init();
+  DoNotSend=1;
   ShowPLATO((padByte *)splash,sizeof(splash));
   terminal_initial_position();
   io_init();
+  DoNotSend=0;
   emscripten_set_main_loop(loop,0,0);
 }

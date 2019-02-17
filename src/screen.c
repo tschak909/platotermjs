@@ -15,6 +15,7 @@
 #include "screen.h"
 #include "protocol.h"
 #include "font.h"
+#include "canvas.h"
 
 unsigned char CharHigh=16;
 unsigned char CharWide=8;
@@ -22,11 +23,16 @@ padPt TTYLoc;
 
 SDL_Window *window;
 SDL_Renderer *renderer;
+SDL_Texture *texture;
+extern SDL_Surface *surface;
 padRGB backgroundColor={0,0,0};
 padRGB foregroundColor={255,255,255};
 
 short max(short a, short b) { return ( a > b ) ? a : b; }
 short min(short a, short b) { return ( a < b ) ? a : b; }
+
+#define true 1
+#define false 0
 
 extern padBool FastText;
 
@@ -35,9 +41,21 @@ extern padBool FastText;
  */
 void screen_init(void)
 {
+  canvas_init();
   SDL_Init(SDL_INIT_VIDEO);
   SDL_CreateWindowAndRenderer(512,512,0,&window,&renderer);
   screen_clear();
+}
+
+/**
+ * screen_main() - render/preserve screen
+ */
+void screen_main(void)
+{
+  texture = SDL_CreateTextureFromSurface(renderer,surface);
+  SDL_RenderCopy(renderer,texture,NULL,NULL);
+  SDL_RenderPresent(renderer);
+  SDL_DestroyTexture(texture);
 }
 
 /**
@@ -59,10 +77,7 @@ void screen_beep(void)
  */
 void screen_clear(void)
 {
-  SDL_SetRenderDrawColor(renderer,backgroundColor.red,backgroundColor.green,backgroundColor.blue,255);
-  SDL_RenderClear(renderer);
-  SDL_RenderPresent(renderer);
-  SDL_SetRenderDrawColor(renderer,foregroundColor.red,foregroundColor.green,foregroundColor.blue,255);
+  canvas_clear(SDL_MapRGB(surface->format,backgroundColor.red,backgroundColor.green,backgroundColor.blue));
 }
 
 /**
@@ -70,10 +85,6 @@ void screen_clear(void)
  */
 void screen_set_pen_mode(void)
 {
-  if ((CurMode==ModeErase)||(CurMode==ModeInverse))
-    SDL_SetRenderDrawColor(renderer,backgroundColor.red,backgroundColor.green,backgroundColor.blue,255);
-  else
-    SDL_SetRenderDrawColor(renderer,foregroundColor.red,foregroundColor.green,foregroundColor.blue,255);
 }
 
 /**
@@ -91,14 +102,11 @@ void screen_block_draw(padPt* Coord1, padPt* Coord2)
   x2=max(Coord1->x,Coord2->x);
   y1=min((Coord1->y^0x1FF)&0x1FF,(Coord2->y^0x1FF)&0x1FF);
   y2=max((Coord1->y^0x1FF)&0x1FF,(Coord2->y^0x1FF)&0x1FF);
-  
-  screen_set_pen_mode();
-  rect.x=x1;
-  rect.y=y1;
-  rect.w=x2-x1;
-  rect.h=y2-y1;
-  SDL_RenderFillRect(renderer,&rect);
-  SDL_RenderPresent(renderer);
+
+  if ((CurMode==ModeErase)||(CurMode==ModeInverse))
+    canvas_block_fill(x1,y1,x2,y2,SDL_MapRGB(surface->format,backgroundColor.red,backgroundColor.green,backgroundColor.blue));
+  else
+    canvas_block_fill(x1,y1,x2,y2,SDL_MapRGB(surface->format,foregroundColor.red,foregroundColor.green,foregroundColor.blue));    
 }
 
 /**
@@ -106,9 +114,10 @@ void screen_block_draw(padPt* Coord1, padPt* Coord2)
  */
 void screen_dot_draw(padPt* Coord)
 {
-  screen_set_pen_mode();
-  SDL_RenderDrawPoint(renderer,Coord->x,(Coord->y^0x1FF)&0x1FF);
-  SDL_RenderPresent(renderer);
+  if ((CurMode==ModeErase)||(CurMode==ModeInverse))
+    canvas_set_pixel(Coord->x,(Coord->y^0x1FF)&0x1FF,SDL_MapRGB(surface->format,backgroundColor.red,backgroundColor.green,backgroundColor.blue));
+  else
+    canvas_set_pixel(Coord->x,(Coord->y^0x1FF)&0x1FF,SDL_MapRGB(surface->format,foregroundColor.red,foregroundColor.green,foregroundColor.blue));      
 }
 
 /**
@@ -116,9 +125,20 @@ void screen_dot_draw(padPt* Coord)
  */
 void screen_line_draw(padPt* Coord1, padPt* Coord2)
 {
-  screen_set_pen_mode();
-  SDL_RenderDrawLine(renderer,Coord1->x,(Coord1->y^0x1FF)&0x1FF,Coord2->x,(Coord2->y^0x1FF)&0x1FF);
-  SDL_RenderPresent(renderer);
+  short x1;
+  short y1;
+  short x2;
+  short y2;
+
+  x1=Coord1->x;
+  x2=Coord2->x;
+  y1=(Coord1->y^0x1FF)&0x1FF;
+  y2=(Coord2->y^0x1FF)&0x1FF;
+  
+  if ((CurMode==ModeErase)||(CurMode==ModeInverse))
+    canvas_line(x1,y1,x2,y2,SDL_MapRGB(surface->format,backgroundColor.red,backgroundColor.green,backgroundColor.blue));
+  else
+    canvas_line(x1,y1,x2,y2,SDL_MapRGB(surface->format,foregroundColor.red,foregroundColor.green,foregroundColor.blue));      
 }
 
 /**
@@ -191,7 +211,10 @@ void screen_char_draw(padPt* Coord, unsigned char* ch, unsigned char count)
     }
 
   x=Coord->x;
-  y=(Coord->y^0x1FF)&0x1FF;
+  if (ModeBold)    
+    y=((Coord->y+30)^0x1FF)&0x1FF;
+  else
+    y=((Coord->y+15)^0x1FF)&0x1FF;
   
   if (FastText==padF)
     {
@@ -214,11 +237,7 @@ void screen_char_draw(padPt* Coord, unsigned char* ch, unsigned char count)
   	  for (k=0;k<8;++k)
   	    {
   	      if (b<0) /* check sign bit. */
-		{
-		  SDL_SetRenderDrawColor(renderer,mainColor.red,mainColor.green,mainColor.blue,255);
-		  SDL_RenderDrawPoint(renderer,x,y);
-		  SDL_RenderPresent(renderer);
-		}
+		canvas_set_pixel(x,y,SDL_MapRGB(surface->format,mainColor.red,mainColor.green,mainColor.blue));
 
 	      ++x;
   	      b<<=1;
@@ -281,31 +300,26 @@ void screen_char_draw(padPt* Coord, unsigned char* ch, unsigned char count)
   	    {
   	      if (b<0) /* check sign bit. */
 		{
-		  SDL_SetRenderDrawColor(renderer,mainColor.red,mainColor.green,mainColor.blue,255);
 		  if (ModeBold)
 		    {
-		      SDL_RenderDrawPoint(renderer,*px+1,*py);
-		      SDL_RenderDrawPoint(renderer,*px,*py+1);
-		      SDL_RenderDrawPoint(renderer,*px+1,*py+1);
-		      SDL_RenderPresent(renderer);
+		      canvas_set_pixel(*px+1,*py,SDL_MapRGB(surface->format,mainColor.red,mainColor.green,mainColor.blue));
+		      canvas_set_pixel(*px,*py+1,SDL_MapRGB(surface->format,mainColor.red,mainColor.green,mainColor.blue));
+		      canvas_set_pixel(*px+1,*py+1,SDL_MapRGB(surface->format,mainColor.red,mainColor.green,mainColor.blue));
 		    }
-		  SDL_RenderDrawPoint(renderer,*px,*py);
-		  SDL_RenderPresent(renderer);
+		  canvas_set_pixel(*px,*py,SDL_MapRGB(surface->format,mainColor.red,mainColor.green,mainColor.blue));
 		}
 	      else
 		{
 		  if (CurMode==ModeInverse || CurMode==ModeRewrite)
 		    {
-		      SDL_SetRenderDrawColor(renderer,altColor.red,altColor.green,altColor.blue,255);
+		      /* SDL_SetRenderDrawColor(renderer,altColor.red,altColor.green,altColor.blue,255); */
 		      if (ModeBold)
 			{
-			  SDL_RenderDrawPoint(renderer,*px+1,*py);
-			  SDL_RenderDrawPoint(renderer,*px,*py+1);
-			  SDL_RenderDrawPoint(renderer,*px+1,*py+1);
-			  SDL_RenderPresent(renderer);
+			  canvas_set_pixel(*px+1,*py,SDL_MapRGB(surface->format,altColor.red,altColor.green,altColor.blue));
+			  canvas_set_pixel(*px,*py+1,SDL_MapRGB(surface->format,altColor.red,altColor.green,altColor.blue));
+			  canvas_set_pixel(*px+1,*py+1,SDL_MapRGB(surface->format,altColor.red,altColor.green,altColor.blue));
 			}
-		      SDL_RenderDrawPoint(renderer,*px,*py);
-		      SDL_RenderPresent(renderer);
+		      canvas_set_pixel(*px,*py,SDL_MapRGB(surface->format,altColor.red,altColor.green,altColor.blue));
 		    }
 		}
 
@@ -366,6 +380,9 @@ void screen_tty_char(padByte theChar)
  */
 void screen_foreground(padRGB* theColor)
 {
+  foregroundColor.red = theColor->red;
+  foregroundColor.green = theColor->green;
+  foregroundColor.blue = theColor->blue;
 }
 
 /**
@@ -373,6 +390,9 @@ void screen_foreground(padRGB* theColor)
  */
 void screen_background(padRGB* theColor)
 {
+  backgroundColor.red = theColor->red;
+  backgroundColor.green = theColor->green;
+  backgroundColor.blue = theColor->blue;
 }
 
 /**
@@ -380,6 +400,65 @@ void screen_background(padRGB* theColor)
  */
 void screen_paint(padPt* Coord)
 {
+  static unsigned short xStack[512];
+  static unsigned short yStack[512];
+  unsigned char stackentry = 1;
+  unsigned char spanAbove, spanBelow;
+  int x = Coord->x;
+  int y = (Coord->y^0x1FF)&0x1FF;
+  Uint32 oldColor = canvas_get_pixel32(x,y);
+  Uint32 foregroundColorPixel = SDL_MapRGB(surface->format,foregroundColor.red,foregroundColor.green,foregroundColor.blue);
+
+  if (oldColor == foregroundColorPixel)
+    return;
+
+  do
+    {
+      unsigned short startx;
+      while (x > 0 && canvas_get_pixel32(x-1,y) == oldColor)
+        --x;
+
+      spanAbove = spanBelow = false;
+      startx=x;
+
+      while(canvas_get_pixel32(x,y) == oldColor)
+        {
+          if (y < (511))
+            {
+              Uint32 belowColor = canvas_get_pixel32(x, y+1);
+              if (!spanBelow  && belowColor == oldColor)
+                {
+                  xStack[stackentry]  = x;
+                  yStack[stackentry]  = y+1;
+                  ++stackentry;
+                  spanBelow = true;
+                }
+              else if (spanBelow && belowColor != oldColor)
+                spanBelow = false;
+            }
+
+          if (y > 0)
+            {
+              Uint32 aboveColor = canvas_get_pixel32(x, y-1);
+              if (!spanAbove  && aboveColor == oldColor)
+                {
+                  xStack[stackentry]  = x;
+                  yStack[stackentry]  = y-1;
+                  ++stackentry;
+                  spanAbove = true;
+                }
+              else if (spanAbove && aboveColor != oldColor)
+                spanAbove = false;
+            }
+
+          ++x;
+        }
+      canvas_line(startx,y,x-1,y,foregroundColorPixel);
+      --stackentry;
+      x = xStack[stackentry];
+      y = yStack[stackentry];
+    }
+  while (stackentry);  
 }
 
 /**

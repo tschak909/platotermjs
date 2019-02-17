@@ -18,6 +18,11 @@
 void screen_init(void);
 
 /**
+ * screen_main() - render/preserve screen
+ */
+void screen_main(void);
+
+/**
  * screen_wait(void) - Sleep for approx 16.67ms
  */
 void screen_wait(void);

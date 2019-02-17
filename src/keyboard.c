@@ -1,10 +1,13 @@
-
+#include <SDL2/SDL.h>
 #include "keyboard.h"
 #include "key.h"
 #include "protocol.h"
 #include "io.h"
 
 unsigned char ch;
+
+extern int something_happened;
+extern SDL_Event event;
 
 void keyboard_out(unsigned char platoKey)
 {
@@ -23,6 +26,15 @@ void keyboard_out(unsigned char platoKey)
 
 void keyboard_main(void)
 {
+  if (something_happened==0)
+    return;
+
+  if (event.key.type==SDL_KEYDOWN)
+    {
+      SDL_Keycode key = event.key.keysym.sym;
+      keyboard_out(key_to_pkey[key]);
+    }
+  
   /* if (kbhit()) */
   /*   { */
   /*     ch=cgetc(); */
