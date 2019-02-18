@@ -22,6 +22,7 @@ SDLNet_SocketSet set;
 int numReady;
 unsigned char d;
 unsigned char DoNotSend=true;
+unsigned char buffer[4096];
 
 /**
  * io_init() - Set-up the I/O
@@ -53,9 +54,8 @@ void io_main(void)
   numReady=SDLNet_CheckSockets(set,0);
   if (numReady)
     {
-      SDLNet_TCP_Recv(sock,&d,1);
-      printf("%c",d);
-      ShowPLATO(&d,1);
+      len=SDLNet_TCP_Recv(sock,&buffer,4096);
+      ShowPLATO(buffer,len);
     }
 }
 

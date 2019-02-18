@@ -227,14 +227,15 @@ void terminal_ext_out(padByte value)
  */
 void terminal_char_load(padWord charnum, charData theChar)
 {
-  memset(&fontm23[FONTPTR(charnum)],0,16);
+  memset(&fontm23[(charnum*16)],0,16);
   for (curr_word=0;curr_word<8;curr_word++)
     {
       for (u=16; u-->0; )
   	{
   	  if (theChar[curr_word] & 1<<u)
   	    {
-  	      fontm23[(FONTPTR(charnum)+u^0x0f)&0x0f]|=BTAB[curr_word];
+	      //  	      fontm23[((charnum*16)+u^0x0f)&0x0f]|=BTAB[curr_word];
+	      fontm23[(charnum*16+u)^0x0f]|=BTAB[curr_word];
   	    }
   	}
     }

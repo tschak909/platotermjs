@@ -25,6 +25,7 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Texture *texture;
 extern SDL_Surface *surface;
+unsigned char fontm23[2048];
 padRGB backgroundColor={0,0,0};
 padRGB foregroundColor={255,255,255};
 
@@ -312,7 +313,6 @@ void screen_char_draw(padPt* Coord, unsigned char* ch, unsigned char count)
 		{
 		  if (CurMode==ModeInverse || CurMode==ModeRewrite)
 		    {
-		      /* SDL_SetRenderDrawColor(renderer,altColor.red,altColor.green,altColor.blue,255); */
 		      if (ModeBold)
 			{
 			  canvas_set_pixel(*px+1,*py,SDL_MapRGB(surface->format,altColor.red,altColor.green,altColor.blue));

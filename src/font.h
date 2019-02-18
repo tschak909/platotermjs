@@ -486,5 +486,3 @@ unsigned char font[]={
 
 // Get rid of font pointer table.
 #define FONTPTR(a) (a<<4)
-
-unsigned char fontm23[2048];
