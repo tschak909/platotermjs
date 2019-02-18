@@ -10,7 +10,7 @@ SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
-CFLAGS=-s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_NET=2 -s USE_SDL_GFX=2 --emrun
+CFLAGS=-O3 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_NET=2 -s USE_SDL_GFX=2 --emrun
 LDFLAGS=-s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_NET=2 --emrun
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
