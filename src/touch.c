@@ -7,21 +7,48 @@
  * touch.c - Touchscreen functions
  */
 
+#include <SDL2/SDL.h>
+#include <stdio.h>
+#include <math.h>
 #include "touch.h"
 #include "protocol.h"
+
+extern int something_happened;
+extern SDL_Event event;
 
 /**
  * touch_init() - Set up touch screen
  */
 void touch_init(void)
 {
+  SDL_DisplayMode mode;
+  SDL_GetCurrentDisplayMode(0,&mode);
+  printf("X: %d Y: %d \n",mode.w,mode.h);
 }
 
 /**
  * touch_main() - Main loop for touch screen
  */
 void touch_main(void)
-{
+{  
+  if (something_happened==0)
+    return;
+  
+  if (event.type==SDL_MOUSEBUTTONUP)
+    {
+      padPt pt={event.button.x,((event.button.y^0x1FF)&0x1FF)};
+      Touch(&pt);
+    }
+  else if (event.type==SDL_FINGERUP)
+    {
+      SDL_DisplayMode mode;
+      padPt pt;
+
+      SDL_GetCurrentDisplayMode(0,&mode);
+      pt.x=ceil(event.tfinger.x*mode.w);
+      pt.y=ceil(event.tfinger.y*mode.h);
+      Touch(&pt);      
+    }
 }
 
 /**

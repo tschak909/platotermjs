@@ -45,7 +45,10 @@
       margin: 2px;
       }
       .keyboard-grabber {
-         grid-column-end: span 60;
+      grid-column-end: span 60;
+      cursor: move;
+      color: #212121;
+      font-size: 24px;
       }
       .key.is-arrow-down, .key.is-arrow-up {
       grid-column-start: 51;
@@ -159,6 +162,35 @@
       image-rendering: pixelated;
       -ms-interpolation-mode: nearest-neighbor;
       }
+
+      #keytable{
+      position: fixed;
+      overflow-y: auto;
+      bottom: 0;
+      right: 0;
+      width: auto;
+      height: 100%;
+      background-color: #212121;
+      color: #FFF;
+      font-size: 16px;
+      opacity: 0.3;
+      padding: 16px;
+      }
+      #keytable tr
+      {
+        cursor: pointer;
+      }
+      #keytable tr:hover
+      {
+      color: #000 !important;
+      background-color: #E0E0E0 !important;
+      }
+      #keytable tr:nth-child(even)
+      {
+      background-color: #707070;
+      color: #FFF;
+      }
+
     </style>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300" rel="stylesheet" />
   </head>
@@ -168,7 +200,7 @@
     <div class="keyboard-container">
       <div class="keyboard">
 	<!-- First row -->
-	<div class="keyboard-grabber">&nbsp;</div>
+	<div class="keyboard-grabber">&#10021;</div>
 	<div class="key" ontouchend="Module._keyboard_out(0x00+shift_status); handle_shift();">
 	  <div class="key__top">&lt;</div>
 	  <div class="key__bottom">0</div>
@@ -297,10 +329,174 @@
       </div>
       
     </div>
+
+    <div id="keytable">
+      <table>
+	<tr>
+	  <th>PLATO</th>
+	  <th>PC</th>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x12)">
+	  <td>ANS</td>
+	  <td>^A</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x32)">
+	  <td>TERM</td>
+	  <td>&#8679;^A</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x18)">
+	  <td>BACK</td>
+	  <td>^B</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x38)">
+	  <td>BACK1/SHIFT-BACK</td>
+	  <td>&#8679;^B</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x1B)">
+	  <td>COPY</td>
+	  <td>^C</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x3B)">
+	  <td>COPY1/SHIFT-COPY</td>
+	  <td>&#8679;^C</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x19)">
+	  <td>DATA</td>
+	  <td>CTRL-A</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x39)">
+	  <td>DATA1/SHIFT-DATA</td>
+	  <td>&#8679;^D</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x17)">
+	  <td>EDIT</td>
+	  <td>^E</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x37)">
+	  <td>EDIT1/SHIFT-EDIT</td>
+	  <td>CTRL-A</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x34)">
+	  <td>FONT</td>
+	  <td>^F</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x0B)">
+	  <td>&#247;</td>
+	  <td>^G</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x15)">
+	  <td>HELP</td>
+	  <td>^H</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x35)">
+	  <td>HELP1/SHIFT-HELP</td>
+	  <td>&#8679;^H</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x1D)">
+	  <td>LAB</td>
+	  <td>^L</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x3D)">
+	  <td>LAB1/SHIFT-LAB</td>
+	  <td>&#8679;^L</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x14)">
+	  <td>MICRO</td>
+	  <td>^M</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x12)">
+	  <td>ANS</td>
+	  <td>CTRL-A</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x16)">
+	  <td>NEXT</td>
+	  <td>ENTER</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x36)">
+	  <td>NEXT1/SHIFT-NEXT</td>
+	  <td>&#8679;ENTER</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x10)">
+	  <td>SUPER</td>
+	  <td>^P</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x10)">
+	  <td>SUPER1/SHIFT-SUPER</td>
+	  <td>&#8679;^P</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x1C)">
+	  <td>&#9633;</td>
+	  <td>TBD</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x3C)">
+	  <td>ACCESS</td>
+	  <td>TBD</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x13)">
+	  <td>ERASE</td>
+	  <td>&#9003;</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x33)">
+	  <td>ERASE1/SHIFT-ERASE</td>
+	  <td>&#8679;&#9003;</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x1A)">
+	  <td>STOP</td>
+	  <td>^S</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x3A)">
+	  <td>STOP1/SHIFT-STOP</td>
+	  <td>&#8679;^S</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x0A)">
+	  <td>&times;</td>
+	  <td>^X</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x2A)">
+	  <td>&#8746;</td>
+	  <td>&#8679;^X</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x11)">
+	  <td>SUB</td>
+	  <td>^Y</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x31)">
+	  <td>SUB1/SHIFT-SUB</td>
+	  <td>&#8679;^Y</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x2E)">
+	  <td>&#931;</td>
+	  <td>^+</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x2F)">
+	  <td>&#916;</td>
+	  <td>^-</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x31)">
+	  <td>&#8656;</td>
+	  <td>ESC</td>
+	</tr>
+      </table>
+    </div>
     
     <script type='text/javascript'>
 
       var shift_status=0; // 0 = normal, 0x20 = shift pressed.
+
+      function is_touch_device() {
+      return (('ontouchstart' in window)
+      || (navigator.MaxTouchPoints > 0)
+      || (navigator.msMaxTouchPoints > 0));
+      }
+
+      if (!is_touch_device())
+      {
+      document.querySelector(".keyboard-container").style.display='none';
+      }
+      else
+      {
+      document.getElementById('keytable').style.display='none';
+      }
       
       var Module = {
       preRun: [],
@@ -394,6 +590,15 @@
       container.addEventListener("mouseup", dragEnd, false);
       container.addEventListener("mousemove", drag, false);
 
+
+      function inhibitBrowserKeys(event) {
+        if (event.ctrlKey && ((event.keyCode > 0x40) && (event.keyCode < 0x5B))) { event.preventDefault(); }
+								       
+      }
+      
+      window.addEventListener("keydown",inhibitBrowserKeys, false);
+
+      
       function dragStart(e) {
       if (e.type === "touchstart") {
       initialX = e.touches[0].clientX - xOffset;

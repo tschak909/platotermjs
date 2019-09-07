@@ -9,6 +9,7 @@
 #include "terminal.h"
 #include "keyboard.h"
 #include "splash.h"
+#include "touch.h"
 
 unsigned char already_started=false;
 SDL_Event event;
@@ -25,6 +26,7 @@ void loop(void)
   keyboard_main();
   io_main();
   screen_main();
+  touch_main();
 }
 
 /* track CSS element size changes and update the WebGL canvas size */
@@ -38,6 +40,7 @@ int main(void)
 {
   emscripten_set_main_loop(loop,0,0);
   screen_init();
+  touch_init();
   DoNotSend=1;
   ShowPLATO((padByte *)splash,sizeof(splash));
   terminal_initial_position();
