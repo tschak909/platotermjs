@@ -36,14 +36,14 @@ static EM_BOOL _emsc_size_changed(int event_type, const EmscriptenUiEvent* ui_ev
 
 int main(void)
 {
+  emscripten_set_main_loop(loop,0,0);
   screen_init();
   DoNotSend=1;
   ShowPLATO((padByte *)splash,sizeof(splash));
   terminal_initial_position();
   io_init();
   DoNotSend=0;
-  emscripten_get_element_css_size("#canvas", &_emsc_width, &_emsc_height);
-  emscripten_set_canvas_element_size("#canvas", _emsc_width, _emsc_height);
-  emscripten_set_resize_callback(0, 0, false, _emsc_size_changed);
-  emscripten_set_main_loop(loop,0,0);
+  /* emscripten_get_element_css_size("#canvas", &_emsc_width, &_emsc_height); */
+  /* emscripten_set_canvas_element_size("#canvas", _emsc_width, _emsc_height); */
+  /* emscripten_set_resize_callback(0, 0, false, _emsc_size_changed); */
 }

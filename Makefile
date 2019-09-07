@@ -11,7 +11,7 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 CFLAGS=-O3 -s USE_SDL=2 -s USE_SDL_NET=2
-LDFLAGS=-s WASM=1 -s USE_SDL=2 -s USE_SDL_NET=2 --shell-file src/shell.html -s EXPORTED_FUNCTIONS='["_main","_Key"]'
+LDFLAGS=-s WASM=0 -s USE_SDL=2 -s USE_SDL_NET=2 --shell-file src/shell.html -s EXPORTED_FUNCTIONS='["_main","_keyboard_out"]'
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
