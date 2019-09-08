@@ -30,7 +30,7 @@ unsigned char buffer[4096];
 void io_init(void)
 {
   SDLNet_Init();
-  SDLNet_ResolveHost(&ip,"irata.online",2005);
+  SDLNet_ResolveHost(&ip,"js.irata.online",2005);
   sock=SDLNet_TCP_Open(&ip);
   set=SDLNet_AllocSocketSet(1);
   SDLNet_TCP_AddSocket(set,sock);
