@@ -21,9 +21,6 @@ extern SDL_Event event;
  */
 void touch_init(void)
 {
-  SDL_DisplayMode mode;
-  SDL_GetCurrentDisplayMode(0,&mode);
-  printf("X: %d Y: %d \n",mode.w,mode.h);
 }
 
 /**
@@ -38,16 +35,6 @@ void touch_main(void)
     {
       padPt pt={event.button.x,((event.button.y^0x1FF)&0x1FF)};
       Touch(&pt);
-    }
-  else if (event.type==SDL_FINGERUP)
-    {
-      SDL_DisplayMode mode;
-      padPt pt;
-
-      SDL_GetCurrentDisplayMode(0,&mode);
-      pt.x=ceil(event.tfinger.x*mode.w);
-      pt.y=ceil(event.tfinger.y*mode.h);
-      Touch(&pt);      
     }
 }
 

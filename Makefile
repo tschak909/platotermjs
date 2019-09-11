@@ -20,6 +20,7 @@ CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+	uglifyjs build/plato.js --output build/plato-min.js
 
 # assembly
 $(BUILD_DIR)/%.s.o: %.s

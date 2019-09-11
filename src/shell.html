@@ -496,6 +496,23 @@
       else
       {
       document.getElementById('keytable').style.display='none';
+      canvas=document.getElementById('canvas');
+
+      canvas.addEventListener("touchstart", function (e) {
+      mousePos = getTouchPos(canvas, e);
+      var touch = e.touches[0];
+      var mouseEvent = new MouseEvent("mousedown", {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+      });
+      console.log("touch.clientX: "+touch.clientX);
+      console.log("touch clientY: "+touch.clientY);
+      canvas.dispatchEvent(mouseEvent);
+      }, false);
+      canvas.addEventListener("touchend", function (e) {
+      var mouseEvent = new MouseEvent("mouseup", {});
+      canvas.dispatchEvent(mouseEvent);
+      }, false);
       }
       
       var Module = {
