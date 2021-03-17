@@ -3,6 +3,7 @@ TARGET_EXEC ?= plato.html
 BUILD_DIR ?= ./build
 SRC_DIRS ?= ./src
 
+TARGET_URL ?= wss://js.irata.online:2005
 
 CC=emcc
 
@@ -10,8 +11,8 @@ SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
-CFLAGS=-O3 --closure 1 -g0 -s USE_SDL=2 -s USE_SDL_NET=2 -s WEBSOCKET_URL=wss://js.irata.online:2005
-LDFLAGS=-g0 -s WASM=0 -s USE_SDL=2 -s USE_SDL_NET=2 --shell-file src/shell.html -s WEBSOCKET_URL=wss://js.irata.online:2005 -s EXPORTED_FUNCTIONS='["_main","_keyboard_out"]'
+CFLAGS=-O3 --closure 1 -g0 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s WEBSOCKET_URL=$(TARGET_URL)
+LDFLAGS=-g0 -s WASM=0 -s USE_SDL=2 -s USE_SDL_NET=2 --shell-file src/shell.html -s WEBSOCKET_URL=$(TARGET_URL) -s EXPORTED_FUNCTIONS='["_main","_keyboard_out"]'
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
@@ -20,7 +21,7 @@ CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
-	uglifyjs build/plato.js --output build/plato-min.js
+#	uglifyjs build/plato.js --output build/plato-min.js
 
 # assembly
 $(BUILD_DIR)/%.s.o: %.s
