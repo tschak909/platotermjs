@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <meta name="theme-color" content="#349a4d" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="io-icon-152.png">
+    <meta name="theme-color" content="#349a4d"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="IRATA.ONLINE">
+    <meta name="msapplication-TileImage" content="images/io-icon-144.png">
+    <meta name="msapplication-TileColor" content="#349a4d">
+    <title>Welcome to IRATA.ONLINE</title>
+    <style>
+      body { margin: 0; background-color: black }
+
+      .keyboard-container {
+      display: flex;
+      }
+      .keyboard {
+      background-color: #e0e0e0;
+      opacity: 0.3;
+      color: #fff;
+      display: grid;
+      font-family: 'Roboto', sans-serif;
+      font-size: 16px;
+      font-weight: 300;
+      grid-template-columns: repeat(60, 17px);
+      grid-template-rows: repeat(12, 34px);
+      justify-content: center;
+      letter-spacing: 1px;
+      line-height: 24px;
+      padding: 16px;
+      transform-origin: top left;
+      }
+      #k0 {display: grid;}
+      #k1 {display: none;}
+
+      .key {
+      align-items: center;
+      background-color: #212121;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      grid-column-end: span 4;
+      grid-row-end: span 2;
+      grid-template-columns: repeat(2, 32px);
+      grid-template-rows: repeat(2, 32px);
+      justify-content: center;
+      padding: 5px 9px;
+      margin: 2px;
+      }
+      .keyboard-grabber {
+      grid-column-end: span 60;
+      cursor: move;
+      color: #212121;
+      font-size: 24px;
+      }
+      .key.is-arrow-down, .key.is-arrow-up {
+      grid-column-start: 51;
+      grid-row-end: span 1;
+      }
+      .key.is-arrow-down {
+      border-radius: 0 0 4px 4px;
+      grid-row-start: 10;
+      margin-top: 1px;
+      }
+      .key.is-arrow-up {
+      border-radius: 4px 4px 0 0;
+      grid-row-start: 9;
+      margin-bottom: 1px;
+      }
+      .key.is-backspace, .key.is-tab {
+      grid-column-end: span 6;
+      }
+      .key.is-backspace {
+      align-items: flex-end;
+      }
+      .key.is-capslock {
+      grid-column-end: span 7;
+      }
+      .key.is-command, .key.is-shift-left {
+      grid-column-end: span 8;
+      }
+      .key.is-enter {
+      border-radius: 0 4px 4px 4px;
+      grid-column-start: 56;
+      grid-column-end: span 3;
+      grid-row-end: span 4;
+      position: relative;
+      }
+      .key.is-enter::before, .key.is-enter::after {
+      content: '';
+      position: absolute;
+      }
+      .key.is-enter::before {
+      background-color: #212121;
+      border-radius: 4px 0 0 4px;
+      height: 64px;
+      left: - 16px;
+      top: 0;
+      width: 16px;
+      }
+      .key.is-enter::after {
+      border-top-right-radius: 4px;
+      box-shadow: - 4px 4px 0 0 #212121 inset;
+      cursor: default;
+      height: 8px;
+      left: - 4px;
+      top: 60px;
+      width: 8px;
+      }
+      .key.is-enter .key__top {
+      height: 54px;
+      }
+      .key.is-left, .key.is-right {
+      font-size: 12px;
+      justify-content: space-between;
+      line-height: 20px;
+      }
+      .key.is-left {
+      align-items: flex-start;
+      }
+      .key.is-right {
+      align-items: flex-end;
+      }
+      .key.is-erase {
+      grid-column-end: span 8;
+      }
+      .key.is-shift-right {
+      grid-column-end: span 8;
+      }
+      .key.is-next {
+      grid-column-end: span 12;
+      }
+      .key.is-space {
+      grid-column-end: span 28;
+      }
+      .key.is-tab {
+      align-items: flex-start;
+      }
+      .key__bottom, .key__top {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      }
+      .key__bottom {
+      flex-grow: 1;
+      }
+      
+      .game {
+      position: absolute;
+      z-index: -1;
+      top: 0px;
+      left: 0px;
+      margin: 0px;
+      border: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: block;
+      image-rendering: optimizeSpeed;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -o-crisp-edges;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: optimize-contrast;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
+      -ms-interpolation-mode: nearest-neighbor;
+      }
+
+      #keytable{
+      position: fixed;
+      overflow-y: auto;
+      bottom: 0;
+      right: 0;
+      width: auto;
+      height: 100%;
+      background-color: #212121;
+      color: #FFF;
+      font-size: 16px;
+      opacity: 0.3;
+      padding: 16px;
+      }
+      #keytable tr
+      {
+        cursor: pointer;
+      }
+      #keytable tr:hover
+      {
+      color: #000 !important;
+      background-color: #E0E0E0 !important;
+      }
+      #keytable tr:nth-child(even)
+      {
+      background-color: #707070;
+      color: #FFF;
+      }
+
+    </style>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300" rel="stylesheet" />
+  </head>
+  <body>
+    <canvas class="game" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+
+    <div class="keyboard-container">
+      <div class="keyboard">
+	<!-- First row -->
+	<div class="keyboard-grabber">&#10021;</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x00+shift_status); handle_shift();">
+	  <div class="key__top">&lt;</div>
+	  <div class="key__bottom">0</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x01+shift_status); handle_shift();">
+	  <div class="key__top">&gt;</div>
+	  <div class="key__bottom">1</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x02+shift_status); handle_shift();">
+	  <div class="key__top">[</div>
+	  <div class="key__bottom">2</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x03+shift_status); handle_shift();">
+	  <div class="key__top">]</div>
+	  <div class="key__bottom">3</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x04+shift_status); handle_shift();">
+	  <div class="key__top">$</div>
+	  <div class="key__bottom">4</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x05+shift_status); handle_shift();">
+	  <div class="key__top">%</div>
+	  <div class="key__bottom">5</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x06+shift_status); handle_shift();">
+	  <div class="key__top">_</div>
+	  <div class="key__bottom">6</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x07+shift_status); handle_shift();">
+	  <div class="key__top">'</div>
+	  <div class="key__bottom">7</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x08+shift_status); handle_shift();">
+	  <div class="key__top">*</div>
+	  <div class="key__bottom">8</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x09+shift_status); handle_shift();">
+	  <div class="key__top">(</div>
+	  <div class="key__bottom">9</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x5B+shift_status); handle_shift();">
+	  <div class="key__top">)</div>
+	  <div class="key__bottom">=</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x10+shift_status); handle_shift();">SUPER</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x11+shift_status); handle_shift();">SUB</div>
+	<div class="key is-erase" ontouchend="Module._keyboard_out(0x13+shift_status); handle_shift();">ERASE</div>
+
+	<!-- Second row -->
+	<div class="key">
+	  <div class="key__top">CR</div>
+	  <div class="key__bottom" ontouchend="Module._keyboard_out(0x0C+shift_status); handle_shift();">TAB</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x0E+shift_status); handle_shift();">+</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x51+shift_status); handle_shift();">Q</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x57+shift_status); handle_shift();">W</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x45+shift_status); handle_shift();">E</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x52+shift_status); handle_shift();">R</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x54+shift_status); handle_shift();">T</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x59+shift_status); handle_shift();">Y</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x55+shift_status); handle_shift();">U</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x49+shift_status); handle_shift();">I</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x4f+shift_status); handle_shift();">O</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x50+shift_status); handle_shift();">P</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x1B+shift_status); handle_shift();">COPY</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x14+shift_status); handle_shift();">
+	  <div class="key__top">FONT</div>
+	  <div class="key__bottom">MICRO</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x1C+shift_status); handle_shift();">&#8414;</div>
+
+	<!-- Third row -->
+	<div class="key" ontouchend="Module._keyboard_out(0x0D+shift_status); handle_shift();">&#8656;</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x0F+shift_status); handle_shift();">-</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x41+shift_status); handle_shift();">A</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x53+shift_status); handle_shift();">S</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x44+shift_status); handle_shift();">D</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x46+shift_status); handle_shift();">F</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x47+shift_status); handle_shift();">G</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x48+shift_status); handle_shift();">H</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x4a+shift_status); handle_shift();">J</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x4b+shift_status); handle_shift();">K</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x4c+shift_status); handle_shift();">L</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x5c+shift_status); handle_shift();">
+	  <div class="key__top">:</div>
+	  <div class="key__bottom">;</div>
+	</div>
+	<div class="key is-next" ontouchend="Module._keyboard_out(0x16+shift_status); handle_shift();">NEXT</div>
+
+	<!-- Fourth row -->
+	<div id="leftshift" class="key is-shift-left" ontouchend="shift_status=0x20; enable_shift();">SHIFT</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x5a+shift_status); handle_shift();">Z</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x58+shift_status); handle_shift();">X</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x43+shift_status); handle_shift();">C</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x56+shift_status); handle_shift();">V</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x42+shift_status); handle_shift();">B</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x4e+shift_status); handle_shift();">N</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x4d+shift_status); handle_shift();">M</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x5F+shift_status); handle_shift();">
+	  <div class="key__top">&quot;</div>
+	  <div class="key__bottom">,</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x5E+shift_status); handle_shift();">
+	  <div class="key__top">!</div>
+	  <div class="key__bottom">.</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x5D+shift_status); handle_shift();">
+	  <div class="key__top">?</div>
+	  <div class="key__bottom">/</div>
+	</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x12+shift_status); handle_shift();">
+	  <div class="key__top">TERM</div>
+	  <div class="key__bottom">ANS</div>
+	</div>
+	<div id="rightshift" class="key is-shift-right" ontouchend="shift_status=0x20; enable_shift();">SHIFT</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x18+shift_status); handle_shift();">BACK</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x1A+shift_status); handle_shift();">STOP</div>
+	<!-- Fifth row -->
+	<div class="key is-space" ontouchend="Module._keyboard_out(0x40+shift_status); handle_shift();"></div>
+	<div class="key" ontouchend="Module._keyboard_out(0x19+shift_status); handle_shift();">DATA</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x1D+shift_status); handle_shift();">LAB</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x0B+shift_status); handle_shift();">&#247;</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x0A+shift_status); handle_shift();">&#215;</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x15+shift_status); handle_shift();">HELP</div>
+	<div class="key" ontouchend="Module._keyboard_out(0x17+shift_status); handle_shift();">EDIT</div>
+      </div>
+      
+    </div>
+
+    <div id="keytable">
+      <table>
+	<tr>
+	  <th>PLATO</th>
+	  <th>PC</th>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x12)">
+	  <td>ANS</td>
+	  <td>^A</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x32)">
+	  <td>TERM</td>
+	  <td>&#8679;^A</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x18)">
+	  <td>BACK</td>
+	  <td>^B</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x38)">
+	  <td>BACK1/SHIFT-BACK</td>
+	  <td>&#8679;^B</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x1B)">
+	  <td>COPY</td>
+	  <td>^C</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x3B)">
+	  <td>COPY1/SHIFT-COPY</td>
+	  <td>&#8679;^C</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x19)">
+	  <td>DATA</td>
+	  <td>CTRL-D</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x39)">
+	  <td>DATA1/SHIFT-DATA</td>
+	  <td>&#8679;^D</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x17)">
+	  <td>EDIT</td>
+	  <td>^E</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x37)">
+	  <td>EDIT1/SHIFT-EDIT</td>
+	  <td>CTRL-A</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x34)">
+	  <td>FONT</td>
+	  <td>^F</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x0B)">
+	  <td>&#247;</td>
+	  <td>^G</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x15)">
+	  <td>HELP</td>
+	  <td>^H</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x35)">
+	  <td>HELP1/SHIFT-HELP</td>
+	  <td>&#8679;^H</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x1D)">
+	  <td>LAB</td>
+	  <td>^L</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x3D)">
+	  <td>LAB1/SHIFT-LAB</td>
+	  <td>&#8679;^L</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x14)">
+	  <td>MICRO</td>
+	  <td>^M</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x12)">
+	  <td>ANS</td>
+	  <td>CTRL-A</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x16)">
+	  <td>NEXT</td>
+	  <td>ENTER</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x36)">
+	  <td>NEXT1/SHIFT-NEXT</td>
+	  <td>&#8679;ENTER</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x10)">
+	  <td>SUPER</td>
+	  <td>^P</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x10)">
+	  <td>SUPER1/SHIFT-SUPER</td>
+	  <td>&#8679;^P</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x1C)">
+	  <td>&#9633;</td>
+	  <td>TBD</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x3C)">
+	  <td>ACCESS</td>
+	  <td>TBD</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x13)">
+	  <td>ERASE</td>
+	  <td>&#9003;</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x33)">
+	  <td>ERASE1/SHIFT-ERASE</td>
+	  <td>&#8679;&#9003;</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x1A)">
+	  <td>STOP</td>
+	  <td>^S</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x3A)">
+	  <td>STOP1/SHIFT-STOP</td>
+	  <td>&#8679;^S</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x0A)">
+	  <td>&times;</td>
+	  <td>^X</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x2A)">
+	  <td>&#8746;</td>
+	  <td>&#8679;^X</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x11)">
+	  <td>SUB</td>
+	  <td>^Y</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x31)">
+	  <td>SUB1/SHIFT-SUB</td>
+	  <td>&#8679;^Y</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x2E)">
+	  <td>&#931;</td>
+	  <td>^+</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x2F)">
+	  <td>&#916;</td>
+	  <td>^-</td>
+	</tr>
+	<tr onclick="Module._keyboard_out(0x31)">
+	  <td>&#8656;</td>
+	  <td>ESC</td>
+	</tr>
+      </table>
+    </div>
+    
+    <script type='text/javascript'>
+
+      var shift_status=0; // 0 = normal, 0x20 = shift pressed.
+
+      function is_touch_device() {
+      return (('ontouchstart' in window)
+      || (navigator.MaxTouchPoints > 0)
+      || (navigator.msMaxTouchPoints > 0));
+      }
+
+      if (!is_touch_device())
+      {
+      document.querySelector(".keyboard-container").style.display='none';
+      }
+      else
+      {
+      document.getElementById('keytable').style.display='none';
+      canvas=document.getElementById('canvas');
+
+      canvas.addEventListener("touchstart", function (e) {
+      mousePos = getTouchPos(canvas, e);
+      var touch = e.touches[0];
+      var mouseEvent = new MouseEvent("mousedown", {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+      });
+      console.log("touch.clientX: "+touch.clientX);
+      console.log("touch clientY: "+touch.clientY);
+      canvas.dispatchEvent(mouseEvent);
+      }, false);
+      canvas.addEventListener("touchend", function (e) {
+      var mouseEvent = new MouseEvent("mouseup", {});
+      canvas.dispatchEvent(mouseEvent);
+      }, false);
+      }
+
+      document.addEventListener("keydown",function (e) {
+        document.querySelector(".keyboard-container").style.display='none';
+        document.getElementById("keytable").style.display='block';
+      });
+      
+      var Module = {
+      preRun: [],
+      postRun: [],
+      print: (function() {
+      return function(text) {
+      text = Array.prototype.slice.call(arguments).join(' ');
+      console.log(text);
+      };
+      })(),
+      printErr: function(text) {
+      text = Array.prototype.slice.call(arguments).join(' ');
+      console.error(text);
+      },
+      canvas: (function() {
+      var canvas = document.getElementById('canvas');
+      //canvas.addEventListener("webglcontextlost", function(e) { alert('FIXME: WebGL context lost, please reload the page'); e.preventDefault(); }, false);
+      return canvas;
+      })(),
+      setStatus: function(text) {
+      console.log("status: " + text);
+      },
+      monitorRunDependencies: function(left) {
+      console.log("monitor run deps: " + left);
+      }
+      };
+      window.onerror = function() {
+      console.log("onerror: " + event.message);
+      };
+
+      function enable_shift() {
+      var ls = document.getElementById("leftshift");
+      var rs = document.getElementById("rightshift");
+      ls.style.background="#00FFFF";
+      rs.style.background="#00FFFF";
+      ls.style.color="#000000";
+      rs.style.color="#000000";
+      }
+
+      function disable_shift() {
+      var ls = document.getElementById("leftshift");
+      var rs = document.getElementById("rightshift");
+      ls.style.background="#212121";
+      rs.style.background="#212121";
+      ls.style.color="#FFFFFF";
+      rs.style.color="#FFFFFF";
+      }
+
+      
+      function handle_shift() {
+
+        if (shift_status==0x20)
+          {
+            shift_status=0;
+            disable_shift();
+          }
+
+      }
+
+      const keyboard = document.querySelector('.keyboard');
+      const keyboardContainer = document.querySelector('.keyboard-container');
+      const keyboardWidth = 1064;
+      const updateScale = () => {
+      const newScale = keyboardContainer.offsetWidth / keyboardWidth;
+      
+      keyboard.setAttribute('style', `transform:scale(${
+      newScale > 1 ? 1 : newScale
+      })`);
+      
+      };
+
+      window.addEventListener('resize', updateScale)
+      updateScale();
+
+      var dragItem = document.querySelector(".keyboard");
+      var container = document.querySelector(".keyboard-container");
+
+      var active = false;
+      var currentX;
+      var currentY;
+      var initialX;
+      var initialY;
+      var xOffset = 0;
+      var yOffset = 0;
+
+      container.addEventListener("touchstart", dragStart, false);
+      container.addEventListener("touchend", dragEnd, false);
+      container.addEventListener("touchmove", drag, false);
+
+      container.addEventListener("mousedown", dragStart, false);
+      container.addEventListener("mouseup", dragEnd, false);
+      container.addEventListener("mousemove", drag, false);
+
+
+      function inhibitBrowserKeys(event) {
+        if (event.ctrlKey && ((event.keyCode > 0x40) && (event.keyCode < 0x5B))) { event.preventDefault(); }
+								       
+      }
+      
+      window.addEventListener("keydown",inhibitBrowserKeys, false);
+
+      
+      function dragStart(e) {
+      if (e.type === "touchstart") {
+      initialX = e.touches[0].clientX - xOffset;
+      initialY = e.touches[0].clientY - yOffset;
+      } else {
+      initialX = e.clientX - xOffset;
+      initialY = e.clientY - yOffset;
+      }
+
+      if (e.target === dragItem) {
+      active = true;
+      }
+      }
+
+      function dragEnd(e) {
+      initialX = currentX;
+      initialY = currentY;
+
+      active = false;
+      }
+
+      function drag(e) {
+      if (active) {
+
+      e.preventDefault();
+
+      if (e.type === "touchmove") {
+      currentX = e.touches[0].clientX - initialX;
+      currentY = e.touches[0].clientY - initialY;
+      } else {
+      currentX = e.clientX - initialX;
+      currentY = e.clientY - initialY;
+      }
+
+      var bkg = document.querySelector(".game");
+      
+      xOffset = currentX;
+      yOffset = currentY;
+      
+      setTranslate(currentX, currentY, dragItem);
+      }
+      }
+
+      function setTranslate(xPos, yPos, el) {
+      const newScale = keyboardContainer.offsetWidth / keyboardWidth;
+        el.style.transform = "translate(" + xPos + "px, " + yPos + "px) scale("+(newScale>1 ? 1 : newScale)+") ";
+      }
+
+    </script>
+    <script src="main.js"></script>
+    <script async type="text/javascript" src="plato.js"></script>
+  </body>
+  </html>
+
+

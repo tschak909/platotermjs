@@ -1,0 +1,230 @@
+<html>
+  <head>
+    <title>Test</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300" rel="stylesheet" />
+    <style type="text/css">
+      html,
+      body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      }
+
+      .box {
+      display: flex;
+      flex-flow: column;
+      height: 100%;
+      overflow:hidden;
+      }
+
+      .box .row {
+      border: 1px dotted grey;
+      }
+
+      .box .row.header {
+      flex: 0 1 auto;
+      }
+
+      .box .row.content {
+      flex: 1 1 auto;
+      }
+
+      .box .row.footer {
+      flex: 0 1 auto;
+      }
+
+      .keyboard-container {
+      display: flex;
+      margin 0px;
+      max-width: auto;
+      overflow: hidden;
+      }
+
+      .keyboard {
+      width: 100%;
+      background-color: #212121;
+      color: #444;
+      font-family: 'Roboto', sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      display: grid;
+      grid-template-columns: repeat(20, 5%);
+      grid-template-rows: repeat(10, 34px);
+      justify-content: center;
+      letter-spacing: 1px;
+      line-height: 24px;
+      transform-origin: top left;
+      overflow: hidden;
+      }
+
+      .spacer0{
+      grid-column-end: span 1;
+      grid-row-end: span 2;
+      }
+
+      .spacer1{
+      grid-column-end: span 2;
+      grid-row-end: span 2;
+      }
+      
+      .key {
+      align-items: center;
+      background-color: #FFFFFF;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      grid-column-end: span 2;
+      grid-row-end: span 2;
+      grid-template-columns: repeat(2, 5%);
+      grid-template-rows: repeat(2, 32px);
+      justify-content: center;
+      padding: 5px 9px;
+      margin: 2px;
+      }
+
+      .is-modifier {
+        background-color: #BBB;
+      }
+
+      .is-shift {
+        grid-column-end: span 3;
+      }
+
+      .is-backspace {
+        grid-column-end: span 3;
+      }
+
+      .is-plato {
+      grid-column-end: span 4;
+      }
+
+      .is-space {
+      grid-column-end: span 8;
+      }
+
+      .is-back {
+       grid-column-end: span 3;
+      }
+
+      .is-next {
+       grid-column-end: span 3;
+      }
+
+
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div id="contentframe" class="row content">
+	<canvas class="game" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+      </div>
+      <div class="row footer">
+	<div class="keyboard">
+	  <!-- Row 1 -->
+	  <div class="key">1</div>
+	  <div class="key">2</div>
+	  <div class="key">3</div>
+	  <div class="key">4</div>
+	  <div class="key">5</div>
+	  <div class="key">6</div>
+	  <div class="key">7</div>
+	  <div class="key">8</div>
+	  <div class="key">9</div>
+	  <div class="key">0</div>
+	  <!-- Row 2 -->
+	  <div class="key">q</div>
+	  <div class="key">w</div>
+	  <div class="key">e</div>
+	  <div class="key">r</div>
+	  <div class="key">t</div>
+	  <div class="key">y</div>
+	  <div class="key">u</div>
+	  <div class="key">i</div>
+	  <div class="key">o</div>
+	  <div class="key">p</div>
+	  <!-- Row 3 -->
+	  <div class="spacer0"></div>
+	  <div class="key">a</div>
+	  <div class="key">s</div>
+	  <div class="key">d</div>
+	  <div class="key">f</div>
+	  <div class="key">g</div>
+	  <div class="key">h</div>
+	  <div class="key">j</div>
+	  <div class="key">k</div>
+	  <div class="key">l</div>
+	  <!-- Row 4 -->
+	  <div class="key is-modifier is-shift">&#8679;</div>
+	  <div class="key">z</div>
+	  <div class="key">x</div>
+	  <div class="key">c</div>
+	  <div class="key">v</div>
+	  <div class="key">b</div>
+	  <div class="key">n</div>
+	  <div class="key">m</div>
+	  <div class="key is-modifier is-backspace">&#9003;</div>
+	  <div class="key">!#</div>
+	  <div class="key is-plato">PLATO</div>
+	  <div class="key is-space"></div>
+	  <div class="key is-back">BACK</div>
+	  <div class="key is-next">NEXT</div>
+	</div>
+      </div>
+      
+    </div>
+</div>
+
+    <script type="text/javascript">
+      
+      var Module = {
+      preRun: [],
+      postRun: [],
+      print: (function() {
+      return function(text) {
+      text = Array.prototype.slice.call(arguments).join(' ');
+      console.log(text);
+      };
+      })(),
+      printErr: function(text) {
+      text = Array.prototype.slice.call(arguments).join(' ');
+      console.error(text);
+      },
+      canvas: (function() {
+      var canvas = document.getElementById('canvas');
+      //canvas.addEventListener("webglcontextlost", function(e) { alert('FIXME: WebGL context lost, please reload the page'); e.preventDefault(); }, false);
+      return canvas;
+      })(),
+      setStatus: function(text) {
+      console.log("status: " + text);
+      },
+      monitorRunDependencies: function(left) {
+      console.log("monitor run deps: " + left);
+      }
+      };
+      window.onerror = function() {
+      console.log("onerror: " + event.message);
+      };
+
+      window.addEventListener("load",function(e) {
+      var c=document.getElementById("canvas")
+      var cw=document.getElementById("contentframe").offsetWidth;
+      var ch=document.getElementById("contentframe").offsetHeight;
+      c.style.width=cw;
+      c.style.height=ch;
+      });
+
+      window.addEventListener("resize",function(e) {
+      var c=document.getElementById("canvas")
+      var cw=document.getElementById("contentframe").offsetWidth;
+      var ch=document.getElementById("contentframe").offsetHeight;
+      c.style.width=cw;
+      c.style.height=ch;
+      });
+      
+    </script>
+    <script async type="text/javascript" src="plato.js"></script>
+
+
+</body>
+</html>
